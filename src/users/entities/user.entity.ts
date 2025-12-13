@@ -1,0 +1,53 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+
+export type UserDocument = HydratedDocument<User>;
+
+@Schema({
+  collection: 'users',
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
+})
+export class User {
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true })
+  password: string;
+
+  @Prop({ type: Date, default: null })
+  email_verified_at: Date | null;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  follows: Types.ObjectId[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  followers: Types.ObjectId[];
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  members: Types.ObjectId[];
+
+  @Prop()
+  avatar?: string;
+
+  @Prop()
+  photo_url?: string;
+
+  @Prop()
+  bio?: string;
+
+  @Prop({ default: true })
+  isActive: boolean;
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);
+
+// Indexes
+UserSchema.index({ email: 1 });
+UserSchema.index({ follows: 1 });
+UserSchema.index({ followers: 1 });
