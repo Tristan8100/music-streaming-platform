@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePassword, UpdateProfile, UpdateUserDto } from './dto/update-user.dto';
 import { FollowsService } from './follows/follows.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/auth.user';
@@ -56,6 +56,19 @@ export class UsersController {
   @Get('followers')
   getAllFollowers(@Request() req) {
     return this.followsService.getAllFollowers(req.user.id);
+  }
+
+  //SETTINGS == NOT YET TESTED
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch('update-name')
+  updateName(@Request() req, @Body() updateUserDto: UpdateProfile) {
+    return this.usersService.updateName(req.user.id, updateUserDto);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Patch('update-password')
+  updatePassword(@Request() req, @Body() dto: UpdatePassword) {
+    return this.usersService.updatePassword(req.user.id, dto);
   }
 
 }

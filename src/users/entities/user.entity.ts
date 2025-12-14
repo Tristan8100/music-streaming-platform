@@ -38,6 +38,9 @@ export class User {
   @Prop()
   photo_url?: string;
 
+  @Prop({ type: [String], default: [] })
+  genre_artist: [];
+
   @Prop()
   bio?: string;
 
@@ -48,6 +51,6 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 // Indexes
-UserSchema.index({ email: 1 });
+//UserSchema.index({ email: 1 }); //not needed since email is unique probably idk
 UserSchema.index({ follows: 1 });
 UserSchema.index({ followers: 1 });

@@ -17,6 +17,9 @@ export class Song {
   @Prop({ required: true })
   music_url: string;
 
+  @Prop({ type: [String], default: [] })
+  genre_song: [];
+
   @Prop()
   photo_url?: string;
 

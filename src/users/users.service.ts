@@ -8,7 +8,7 @@ import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePassword, UpdateProfile, UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 
 @Injectable()
@@ -85,4 +85,45 @@ export class UsersService {
     const user = await this.findOne(id);
     await user.deleteOne();
   }
+
+
+  //SETTINGS
+  async updateName(id: string, updateUserDto: UpdateProfile) {
+    return this.userModel.updateOne({ _id: id }, { $set: updateUserDto }).exec();
+  }
+
+  async updatePassword(userId: string, dto: UpdatePassword) {
+    const { currentPassword, password, confirmPassword } = dto;
+
+    const user = await this.userModel.findById(userId).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isPasswordValid) {
+      throw new ConflictException('Current password is incorrect');
+    }
+
+    if (password !== confirmPassword) {
+      throw new ConflictException('Passwords do not match');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await this.userModel.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!result) {
+      throw new NotFoundException('User not found');
+    }
+
+    return { message: 'Password updated successfully' };
+  }
+
 }

@@ -21,6 +21,9 @@ export class Album {
   @Prop({ type: [SongSchema], default: [] }) // arrays of songs, whole object
   songs: Song[];
 
+  @Prop({ type: [String], default: [] })
+  genre_album: [];
+
   @Prop()
   photo_url?: string;
 
