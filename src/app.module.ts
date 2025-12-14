@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MusicModule } from './music/music.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MusicModule } from './music/music.module';
     UsersModule,
     AuthModule,
     MusicModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

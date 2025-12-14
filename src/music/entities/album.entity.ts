@@ -25,6 +25,9 @@ export class Album {
   genre_album: [];
 
   @Prop()
+  photo_local_path?: string;
+
+  @Prop()
   photo_url?: string;
 
   @Prop()

@@ -33,7 +33,7 @@ export class User {
   members: Types.ObjectId[];
 
   @Prop()
-  avatar?: string;
+  photo_local_path?: string; //CHANGED FOR SUPABASE
 
   @Prop()
   photo_url?: string;

@@ -21,6 +21,9 @@ export class Song {
   genre_song: [];
 
   @Prop()
+  photo_local_path?: string;
+
+  @Prop()
   photo_url?: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
