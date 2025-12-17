@@ -27,7 +27,7 @@ export class StorageService {
         contentType: file.mimetype,
       });
 
-    const { data : publicUrl } = this.client.storage //duplicate data needs to deserialized
+    const { data : actual_url } = this.client.storage //duplicate data needs to deserialized
       .from(bucket)
       .getPublicUrl(data?.path as string);
 
@@ -36,9 +36,14 @@ export class StorageService {
     }
 
     return {
-      path: publicUrl,
-      data};
+      path: actual_url.publicUrl,
+      local_path: data.path,
+    };
   }
+
+  //const upload = ...function
+  //return { upload.path, full url
+  //         upload.data, }
 
   async delete(bucket: string, path: string) {
 

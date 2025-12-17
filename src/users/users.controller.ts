@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UploadedFile, UseInterceptors, BadRequestException, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePassword, UpdateProfile, UpdateUserDto } from './dto/update-user.dto';
 import { FollowsService } from './follows/follows.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/auth.user';
+
+import { FileInterceptor } from '@nestjs/platform-express';
+import { StorageService } from 'src/storage/storage.service';
 
 @Controller('users')
 export class UsersController {
@@ -58,6 +61,13 @@ export class UsersController {
     return this.followsService.getAllFollowers(req.user.id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('following')
+  getAllFollowing(@Request() req) {
+    return this.followsService.getAllFollowing(req.user.id);
+  }
+
+
   //SETTINGS == NOT YET TESTED
   @UseGuards(AuthGuard, RolesGuard)
   @Patch('update-name')
@@ -69,6 +79,26 @@ export class UsersController {
   @Patch('update-password')
   updatePassword(@Request() req, @Body() dto: UpdatePassword) {
     return this.usersService.updatePassword(req.user.id, dto);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @UseInterceptors(FileInterceptor('file', {
+    fileFilter: (req, file, callback) => {
+      // Accept only images
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+        return callback(
+          new BadRequestException('Only image files are allowed!'),
+          false,
+        );
+      }
+      callback(null, true);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 }, //5MB max
+  }),)
+  @Post('upload-avatar')
+  async uploadAvatar(@UploadedFile() file: Express.Multer.File, @Request() req) {
+    const avatarUrl = await this.usersService.updateProfile(req.user.id, file);
+    return { avatarUrl };
   }
 
 }

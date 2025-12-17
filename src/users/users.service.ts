@@ -11,11 +11,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePassword, UpdateProfile, UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 
+import { StorageService } from 'src/storage/storage.service';
+
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+
+    private readonly storageService: StorageService,
   ) {}
 
   private async checkEmailExists(
@@ -124,6 +128,37 @@ export class UsersService {
     }
 
     return { message: 'Password updated successfully' };
+  }
+
+  async updateProfile(id: string, data: Express.Multer.File){
+    //get user
+    const user = await this.userModel.findById(id).exec();
+    //check profile path
+    if(user && user.photo_local_path && user.photo_url){
+      //if exist delete old
+      await this.storageService.delete('file_storage', user.photo_local_path);
+
+      await this.userModel.updateOne({ _id: id }, { $unset: { photo_url: "", photo_local_path: "" } }).exec();
+    }
+    
+    //add new
+    const newData = await this.storageService.upload(
+      'file_storage', // Supabase bucket can be env
+      `profile-pictures/${Date.now()}-${data.originalname}`,
+      data,
+    );
+
+    //update user with new data
+    return this.userModel.updateOne(
+      { _id: id },
+      {
+        $set: {
+          photo_local_path: newData.local_path,
+          photo_url: newData.path,
+        },
+      }
+    ).exec();
+    
   }
 
 }

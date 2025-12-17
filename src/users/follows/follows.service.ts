@@ -52,4 +52,12 @@ export class FollowsService {
         }
         return user.followers;
     }
+
+    async getAllFollowing(id: string): Promise<any> {
+        const user = await this.userModel.findOne({ _id: id }).populate('follows', 'name email photo_url').exec();
+        if(!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+        return user.followers;
+    }
 }

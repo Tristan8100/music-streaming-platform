@@ -34,8 +34,7 @@ export class AppController {
 
     return {
       message: 'File uploaded successfully',
-      data: data.data,
-      url: data.path,
+      datas: data,
       bucket: 'file_storage',
     };
   }
