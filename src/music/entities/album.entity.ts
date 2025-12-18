@@ -22,7 +22,7 @@ export class Album {
   songs: Song[];
 
   @Prop({ type: [String], default: [] })
-  genre_album: [];
+  genre_album: string[]; //always put types in array ah
 
   @Prop()
   photo_local_path?: string;
