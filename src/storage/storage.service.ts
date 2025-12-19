@@ -46,7 +46,7 @@ export class StorageService {
   //         upload.data, }
 
   async delete(bucket: string, path: string) {
-
+    console.log('Deleting file at path:', path);
     const { error, data } = await this.client.storage
       .from(bucket)
       .remove([path]);
