@@ -54,3 +54,24 @@ export const UserSchema = SchemaFactory.createForClass(User);
 //UserSchema.index({ email: 1 }); //not needed since email is unique probably idk
 UserSchema.index({ follows: 1 });
 UserSchema.index({ followers: 1 });
+
+
+
+// Followers
+export type FollowDocument = HydratedDocument<Follow>;
+@Schema({
+  collection: 'follows',
+  timestamps: {
+    createdAt: 'created_at',
+    updatedAt: 'updated_at',
+  },
+})
+export class Follow {
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true }) // I follower of user.following, I following user.follower
+  follower: Types.ObjectId; // initiates follow
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true }) // they follower of me.following, they following me.follower
+  following: Types.ObjectId; // being followed
+}
+
+export const FollowSchema = SchemaFactory.createForClass(Follow);
