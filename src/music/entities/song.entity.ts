@@ -8,7 +8,6 @@ export type SongDocument = HydratedDocument<Song>;
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   },
-  _id: true 
 })
 export class Song {
   @Prop({ required: true })
@@ -16,6 +15,9 @@ export class Song {
 
   @Prop({ required: true })
   music_url: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Album', required: true })
+  album_id: Types.ObjectId;
 
   @Prop({ type: [String], default: [] })
   genre_song: [];

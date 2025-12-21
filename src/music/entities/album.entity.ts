@@ -18,8 +18,8 @@ export class Album {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   owner: Types.ObjectId;
 
-  @Prop({ type: [SongSchema], default: [] }) // arrays of songs, whole object
-  songs: Song[];
+  //@Prop({ type: [SongSchema], default: [] }) // arrays of songs, whole object
+  //songs: Song[];
 
   @Prop({ type: [String], default: [] })
   genre_album: string[]; //always put types in array ah

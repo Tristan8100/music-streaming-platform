@@ -8,12 +8,14 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/auth.user';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { SongsService } from './songs/songs.service';
 
 @Controller('music')
 export class MusicController {
   constructor(
     private readonly musicService: MusicService,
     private readonly albumsService: AlbumsService,
+    private readonly songsService: SongsService,
   ) {}
 
   //ALBUMS
@@ -60,6 +62,14 @@ export class MusicController {
   @Get('albums-user/:id')
   getAlbumsByUserId(@Param('id') id: string) {
     return this.albumsService.getAlbumsByUserId(id);
+  }
+
+  //SONGS
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('songs')
+  @UseInterceptors(FileInterceptor('file'))
+  createSong(@Body() data: any, @Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
+    return this.songsService.createSong(data, id, file);
   }
   
 
