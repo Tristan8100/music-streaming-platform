@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Req, UseInterceptors, UploadedFile, Request, UseGuards } from '@nestjs/common';
 import { MusicService } from './music.service';
-import { CreateAlbumDto, CreateMusicDto, UpdateAlbumDto } from './dto/create-music.dto';
+import { CreateAlbumDto, CreateMusicDto, CreateSongsDto, UpdateAlbumDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { AlbumsService } from './albums/albums.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -54,22 +54,22 @@ export class MusicController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums-user') //EXECUTE THE ROUTE WITHOUT PARAMS FIRST
-  getAlbumsByAuthUserId(@Request() req) {
+  getAlbumsByAuthUserId(@Request() req) { //GET USER FROM REQ OBJECT/AUTHENTICATED USER
     return this.albumsService.getAlbumsByUserId(req.user.id);
   }
 
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('albums-user/:id')
+  @Get('albums-user/:id') //GET USER BY ID IN PARAMS
   getAlbumsByUserId(@Param('id') id: string) {
     return this.albumsService.getAlbumsByUserId(id);
   }
 
   //SONGS
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('songs')
+  @Post('songs/:id')
   @UseInterceptors(FileInterceptor('file'))
-  createSong(@Body() data: any, @Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
-    return this.songsService.createSong(data, id, file);
+  createSong(@Body() data: CreateSongsDto, @Param('id') id: string, @Request() req, @UploadedFile() file: Express.Multer.File) {
+    return this.songsService.createSong(req.user.id, data, id, file);
   }
   
 

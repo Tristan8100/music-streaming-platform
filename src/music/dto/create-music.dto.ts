@@ -21,3 +21,12 @@ export class CreateAlbumDto {
 }
 
 export class UpdateAlbumDto extends PartialType(CreateAlbumDto) {}
+
+export class CreateSongsDto {
+    @IsNotEmpty()
+    @IsString()
+    name: string;
+
+    @IsOptional()
+    genre_song?: string[];
+}
