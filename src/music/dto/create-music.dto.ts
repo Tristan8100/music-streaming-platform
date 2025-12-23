@@ -30,3 +30,5 @@ export class CreateSongsDto {
     @IsOptional()
     genre_song?: string[];
 }
+
+export class UpdateSongDto extends PartialType(CreateSongsDto) {}

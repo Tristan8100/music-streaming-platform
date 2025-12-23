@@ -23,11 +23,11 @@ export class User {
   @Prop({ type: Date, default: null })
   email_verified_at: Date | null;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
-  follows: Types.ObjectId[];
+  //@Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  //follows: Types.ObjectId[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
-  followers: Types.ObjectId[];
+  //@Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+  //followers: Types.ObjectId[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
   members: Types.ObjectId[];

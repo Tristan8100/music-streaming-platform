@@ -16,6 +16,9 @@ export class Song {
   @Prop({ type: Types.ObjectId, ref: 'Album', required: true })
   album_id: Types.ObjectId;
 
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user_id: Types.ObjectId; //for faster access
+
   @Prop({ type: [String], default: [] })
   genre_song: [];
 

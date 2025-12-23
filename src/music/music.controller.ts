@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Req, UseInterceptors, UploadedFile, Request, UseGuards } from '@nestjs/common';
 import { MusicService } from './music.service';
-import { CreateAlbumDto, CreateMusicDto, CreateSongsDto, UpdateAlbumDto } from './dto/create-music.dto';
+import { CreateAlbumDto, CreateMusicDto, CreateSongsDto, UpdateAlbumDto, UpdateSongDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
 import { AlbumsService } from './albums/albums.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -66,10 +66,28 @@ export class MusicController {
 
   //SONGS
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('songs/:id')
+  @Get('songs/:id') // THE ID IS SONG ID
+  getSongById(@Param('id') id: string) {
+    return this.songsService.getSongById(id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('songs/:id') // THE ID IS ALBUM ID
   @UseInterceptors(FileInterceptor('file'))
   createSong(@Body() data: CreateSongsDto, @Param('id') id: string, @Request() req, @UploadedFile() file: Express.Multer.File) {
     return this.songsService.createSong(req.user.id, data, id, file);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Put('songs/:id') // THE ID IS SONG ID
+  updateSong(@Body() data: UpdateSongDto, @Param('id') id: string, @Request() req) {
+    return this.songsService.editSong(req.user.id, data, id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete('songs/:id') // THE ID IS SONG ID
+  deleteSong(@Param('id') id: string, @Request() req) {
+    return this.songsService.deleteSong(req.user.id, id);
   }
   
 
