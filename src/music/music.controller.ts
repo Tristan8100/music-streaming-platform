@@ -9,6 +9,7 @@ import { RolesGuard } from 'src/auth/auth.user';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { SongsService } from './songs/songs.service';
+import { LikeService } from './likes/like.service';
 
 @Controller('music')
 export class MusicController {
@@ -16,6 +17,7 @@ export class MusicController {
     private readonly musicService: MusicService,
     private readonly albumsService: AlbumsService,
     private readonly songsService: SongsService,
+    private readonly likeService: LikeService
   ) {}
 
   //ALBUMS
@@ -88,6 +90,25 @@ export class MusicController {
   @Delete('songs/:id') // THE ID IS SONG ID
   deleteSong(@Param('id') id: string, @Request() req) {
     return this.songsService.deleteSong(req.user.id, id);
+  }
+
+  //LIKES
+  @UseGuards(AuthGuard, RolesGuard)
+  @Post('songs-like/:id')
+  likeSong(@Param('id') id: string, @Request() req) {
+    return this.likeService.likeSong(req.user.id, id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Delete('songs-unlike/:id')
+  unLikeSong(@Param('id') id: string, @Request() req) {
+    return this.likeService.unLikeSong(req.user.id, id);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('songs-play/:id') //not yet tested
+  getSongLikes(@Param('id') id: string) {
+    return this.likeService.plays(id);
   }
   
 

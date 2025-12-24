@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, isValidObjectId } from 'mongoose';
 import { Follow, FollowDocument, User, UserDocument } from '../entities/user.entity';
 import { NotFoundException } from '@nestjs/common';
+import e from 'express';
 
 @Injectable()
 export class FollowsService {
@@ -27,17 +28,22 @@ export class FollowsService {
         if(!user) {
             throw new NotFoundException(`User with ID ${followId} not found`);
         } else {
-            const user = await this.followModel.findOne({ follower: data.id, following: followId }).exec();
-            if(!user) {
+            try {
                 //LEGACY
                 //await this.userModel.updateOne({ _id: followId }, { $push: { followers: data.id } }).exec();
                 //await this.userModel.updateOne({ _id: data.id }, { $push: { follows: followId } }).exec();
 
-                await this.followModel.create({ follower: data.id, following: followId });
-            } if(user) {
-                return { message: 'Already followed' };
+                await this.followModel.create({ follower: data.id, following: followId });// if it errors, it means it already exists and transfer to catch
+                await this.userModel.updateOne({ _id: followId }, { $inc: { followers_count: 1 } }).exec();
+                await this.userModel.updateOne({ _id: data.id }, { $inc: { following_count: 1 } }).exec();
+                return { message: 'Followed successfully' };
+            } catch (error) {
+                if(error.code === 11000) {
+                    throw new UnauthorizedException('You are already following this user');
+                } else {
+                    throw new UnauthorizedException('Error following user');
+                }
             }
-            return { message: 'Followed successfully' };
         }
     }
     
@@ -55,6 +61,9 @@ export class FollowsService {
         if(unfollow.deletedCount === 0) {
             throw new NotFoundException(`Follow relationship not found`);
         }
+
+        await this.userModel.updateOne({ _id: followId }, { $inc: { followers_count: -1}, $max: { followers_count: 0 } }).exec();//decrement on their followers
+        await this.userModel.updateOne({ _id: data.id }, { $inc: { following_count: -1}, $max: { following_count: 0 } }).exec();//decrement on your following
         return { message: 'Unfollowed successfully' };
     }
 

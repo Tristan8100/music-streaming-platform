@@ -7,6 +7,7 @@ import { AlbumsService } from './albums/albums.service';
 import { UsersModule } from 'src/users/users.module';
 import { SongsService } from './songs/songs.service';
 import { Song, SongSchema } from './entities/song.entity';
+import { LikeService } from './likes/like.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { Song, SongSchema } from './entities/song.entity';
     UsersModule,
   ],
   controllers: [MusicController],
-  providers: [MusicService, AlbumsService, SongsService],
+  providers: [MusicService, AlbumsService, SongsService, LikeService],
 })
 export class MusicModule {}

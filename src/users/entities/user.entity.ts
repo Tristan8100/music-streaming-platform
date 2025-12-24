@@ -32,6 +32,12 @@ export class User {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
   members: Types.ObjectId[];
 
+  @Prop({ type: Number, default: 0 })
+  followers_count: number;
+
+  @Prop({ type: Number, default: 0 })
+  following_count: number;
+
   @Prop()
   photo_local_path?: string; //CHANGED FOR SUPABASE
 
@@ -75,3 +81,5 @@ export class Follow {
 }
 
 export const FollowSchema = SchemaFactory.createForClass(Follow);
+
+FollowSchema.index({ follower: 1, following: 1 }, { unique: true });
