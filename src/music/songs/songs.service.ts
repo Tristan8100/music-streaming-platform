@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Album, AlbumDocument } from '../entities/album.entity';
 import { Song, SongDocument } from '../entities/song.entity';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { StorageService } from 'src/storage/storage.service';
 import { ObjectId } from 'mongodb';
 import { CreateSongsDto, UpdateSongDto } from '../dto/create-music.dto';
+import { Not } from 'typeorm';
 
 @Injectable()
 export class SongsService {
@@ -73,7 +74,7 @@ export class SongsService {
         }
         const song = await this.songModel.findById(id).populate('album_id').populate('user_id').exec();
         if (!song) {
-            throw new BadRequestException('Song not found');
+            throw new NotFoundException('Song not found');
         }
         return song;
     }

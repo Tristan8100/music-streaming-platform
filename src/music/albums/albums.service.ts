@@ -1,15 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Album, AlbumDocument } from '../entities/album.entity';
 import { Model, isValidObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAlbumDto, UpdateAlbumDto } from '../dto/create-music.dto';
 import { StorageService } from 'src/storage/storage.service';
+import { Song, SongDocument } from '../entities/song.entity';
 
 @Injectable()
 export class AlbumsService {
     constructor(
         @InjectModel(Album.name)
         private readonly albumModel: Model<AlbumDocument>,
+
+        @InjectModel(Song.name)
+        private readonly songModel: Model<SongDocument>,
 
         private readonly storageService: StorageService,
     ) {}
@@ -23,7 +27,7 @@ export class AlbumsService {
         );
         //create album
         const arr = JSON.parse(data.genre_album as any); //considered as string idk why just fcking parse it
-        console.log(data.genre_album);
+        console.log(data.genre_album); //FIX VULNERABILITIES
         const album = await this.albumModel.create({
             title: data.title,
             description: data.description,
@@ -41,7 +45,7 @@ export class AlbumsService {
         if (!album) {
             throw new NotFoundException('Album not found');
         }
-        const arr = JSON.parse(data.genre_album as any);
+        const arr = JSON.parse(data.genre_album as any); //FIX VULNERABILITIES
         let datas; // delare heree
         //check photo
         if (file) {
@@ -144,6 +148,10 @@ export class AlbumsService {
         }
 
         //DELETE THE SONGS PAG MERON
+        const songsCount = await this.songModel.countDocuments({ album_id: id }).exec();
+        if (songsCount > 0) {
+            throw new BadRequestException('Album has songs, delete them first');
+        }
 
         await this.albumModel.deleteOne({ _id: id, owner: userId }).exec();
 
