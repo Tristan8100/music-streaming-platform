@@ -20,7 +20,7 @@ export class MusicController {
     private readonly likeService: LikeService
   ) {}
 
-  //ALBUMS
+  //ALBUMS ---------------------------------------------------------------------
   @UseGuards(AuthGuard, RolesGuard)
   @Post('albums')
   @UseInterceptors(FileInterceptor('file')) // USE FILE INTERCEPTOR TO ALLOW VALIDATION ON DTO WHEN USING FORM-DATA REMEMBER!!!!!
@@ -66,7 +66,13 @@ export class MusicController {
     return this.albumsService.getAlbumsByUserId(id);
   }
 
-  //SONGS
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('albums/songs/:id')
+  getAlbumsAndSongs(@Param('id') id: string) {
+    return this.albumsService.getAlbumsAndSongs(id);
+  }
+
+  //SONGS ----------------------------------------------------------------------
   @UseGuards(AuthGuard, RolesGuard)
   @Get('songs/:id') // THE ID IS SONG ID
   getSongById(@Param('id') id: string) {
@@ -92,7 +98,7 @@ export class MusicController {
     return this.songsService.deleteSong(req.user.id, id);
   }
 
-  //LIKES
+  //LIKES ----------------------------------------------------------------------
   @UseGuards(AuthGuard, RolesGuard)
   @Post('songs-like/:id')
   likeSong(@Param('id') id: string, @Request() req) {

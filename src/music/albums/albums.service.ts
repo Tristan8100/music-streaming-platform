@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CreateAlbumDto, UpdateAlbumDto } from '../dto/create-music.dto';
 import { StorageService } from 'src/storage/storage.service';
 import { Song, SongDocument } from '../entities/song.entity';
+import { ObjectId } from 'typeorm';
 
 @Injectable()
 export class AlbumsService {
@@ -26,7 +27,7 @@ export class AlbumsService {
             file,
         );
         //create album
-        const arr = JSON.parse(data.genre_album as any); //considered as string idk why just fcking parse it
+        const arr = data.genre_album ? JSON.parse(data.genre_album as any) : []; //considered as string idk why just fcking parse it
         console.log(data.genre_album); //FIX VULNERABILITIES
         const album = await this.albumModel.create({
             title: data.title,
@@ -156,5 +157,22 @@ export class AlbumsService {
         await this.albumModel.deleteOne({ _id: id, owner: userId }).exec();
 
         return { message: 'Album deleted successfully' };
+    }
+
+    async getAlbumsAndSongs(id: string): Promise<any> {
+        if(!isValidObjectId(id)){
+            throw new BadRequestException('Invalid ID');
+        }
+
+        const data = await this.albumModel.findById(id).exec(); // no populate because the fk is on the songs
+
+        if (!data) {
+            throw new NotFoundException('Album not found');
+        }
+
+        const songs = await this.songModel.find({ album_id: id }).exec();
+        const newData = { data, songs };
+
+        return newData;
     }
 }
