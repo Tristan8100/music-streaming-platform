@@ -57,7 +57,7 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<UserDocument> {
-    const user = await this.userModel.findById(id).exec();
+    const user = await this.userModel.findById(id).select('-password').exec();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);

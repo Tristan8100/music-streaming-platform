@@ -31,6 +31,12 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('user-auth') // Get Authenticated User Data
+  GetAuthUser(@Request() req) {
+    return this.usersService.findOne(req.user.id);
+  }
+
   @Patch('user/:id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
@@ -78,6 +84,7 @@ export class UsersController {
   @UseGuards(AuthGuard, RolesGuard)
   @Patch('update-password')
   updatePassword(@Request() req, @Body() dto: UpdatePassword) {
+    console.log('ETO DTO',dto);
     return this.usersService.updatePassword(req.user.id, dto);
   }
 
