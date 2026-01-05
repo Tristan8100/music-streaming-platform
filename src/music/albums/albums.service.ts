@@ -50,9 +50,6 @@ export class AlbumsService {
         if (!isValidObjectId(userId) || !isValidObjectId(id)) {
             throw new BadRequestException('Invalid ID');
         }
-        if (!file) {
-            throw new BadRequestException('File is required');
-        }
         //find album
         const album = await this.albumModel.findById(id);
         if (!album) {
