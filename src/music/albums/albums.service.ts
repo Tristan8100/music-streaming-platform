@@ -20,6 +20,12 @@ export class AlbumsService {
     ) {}
 
     async createAlbum(data: any, userId: string, file: Express.Multer.File): Promise<any> {
+        if (!isValidObjectId(userId)) {
+            throw new BadRequestException('Invalid ID');
+        }
+        if (!file) {
+            throw new BadRequestException('File is required');
+        }
         //upload photo
         const photo = await this.storageService.upload(
             'file_storage', // Supabase bucket put to env
@@ -41,6 +47,12 @@ export class AlbumsService {
     }
 
     async updateAlbum(id: string, data: UpdateAlbumDto, userId: string, file?: Express.Multer.File): Promise<any> {
+        if (!isValidObjectId(userId) || !isValidObjectId(id)) {
+            throw new BadRequestException('Invalid ID');
+        }
+        if (!file) {
+            throw new BadRequestException('File is required');
+        }
         //find album
         const album = await this.albumModel.findById(id);
         if (!album) {
