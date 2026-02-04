@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Req, UseInterceptors, UploadedFile, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Req, UseInterceptors, UploadedFile, Request, UseGuards, Query, ParseIntPipe, DefaultValuePipe } from '@nestjs/common';
 import { MusicService } from './music.service';
 import { CreateAlbumDto, CreateMusicDto, CreateSongsDto, UpdateAlbumDto, UpdateSongDto } from './dto/create-music.dto';
 import { UpdateMusicDto } from './dto/update-music.dto';
@@ -42,8 +42,8 @@ export class MusicController {
   @ApiOperation({ summary: 'Get All Albums (general use for admin)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums')
-  showAllAlbums() {
-    return this.albumsService.showAllAlbums();
+  showAllAlbums(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number) {
+    return this.albumsService.showAllAlbums(page);
   }
 
   @ApiOperation({ summary: 'Get One Album data (without songs)' })
@@ -81,7 +81,19 @@ export class MusicController {
     return this.albumsService.getAlbumsAndSongs(id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('albums-following')
+  getSongsByAlbumId(@Request() req) {
+    return this.albumsService.getAlbumsFromFollowing(req.user.id);
+  }
+
   //SONGS ----------------------------------------------------------------------
+  @UseGuards(AuthGuard, RolesGuard)
+  @Get('songs-all')
+  getAllSongs(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number) {
+    return this.songsService.getAllSongs(page);
+  }
+
   @ApiOperation({ summary: 'Get One Song Data (without album)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('songs/:id') // THE ID IS SONG ID

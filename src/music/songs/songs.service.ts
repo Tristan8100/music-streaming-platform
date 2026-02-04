@@ -19,6 +19,23 @@ export class SongsService {
         private readonly storageService: StorageService,
     ) {}
 
+    async getAllSongs(page : number): Promise<any> {
+        const skip = (page - 1) * 10;
+        const [songs, total] = await Promise.all([
+            this.songModel.find().populate('album_id').populate('user_id').skip(skip).limit(10).sort({ createdAt: -1 }).exec(),
+            this.songModel.countDocuments()
+        ]);
+        
+        return {
+            data: songs,
+            meta: {
+            total,
+            page,
+            lastPage: Math.ceil(total / 10),
+            },
+        };
+    }
+
     async createSong(userId: string, data: CreateSongsDto, albumId: string, file: Express.Multer.File): Promise<any> {
         //check user authorization to album
         const album = await this.albumModel.find({ _id: albumId, user: userId });

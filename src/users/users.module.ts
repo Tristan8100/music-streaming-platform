@@ -8,6 +8,6 @@ import { FollowsService } from './follows/follows.service';
   imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: Follow.name, schema: FollowSchema }])], // ADDED
   controllers: [UsersController],
   providers: [UsersService, FollowsService],
-  exports: [UsersService], // ADDED when using on other modules
+  exports: [UsersService, FollowsService], // ADDED when using on other modules
 })
 export class UsersModule {}

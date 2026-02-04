@@ -4,19 +4,24 @@ import { Model, isValidObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateAlbumDto, UpdateAlbumDto } from '../dto/create-music.dto';
 import { StorageService } from 'src/storage/storage.service';
+import { FollowsService } from 'src/users/follows/follows.service';
 import { Song, SongDocument } from '../entities/song.entity';
 import { ObjectId } from 'typeorm';
 
 @Injectable()
 export class AlbumsService {
     constructor(
+        //MODELS
         @InjectModel(Album.name)
         private readonly albumModel: Model<AlbumDocument>,
 
         @InjectModel(Song.name)
         private readonly songModel: Model<SongDocument>,
 
+        //SERVICES
         private readonly storageService: StorageService,
+
+        private readonly followsService: FollowsService
     ) {}
 
     async createAlbum(data: any, userId: string, file: Express.Multer.File): Promise<any> {
@@ -110,10 +115,30 @@ export class AlbumsService {
     }
 
     //get overall albums
-    async showAllAlbums(): Promise<Album[]> {
-        const data = await this.albumModel.find().populate('owner', 'name photo_url email').exec();
-        return data;
+    async showAllAlbums(page: number) {
+        const skip = (page - 1) * 10;
+
+        const [albums, total] = await Promise.all([
+            this.albumModel //albums
+            .find()
+            .populate('owner', 'name photo_url email')
+            .skip(skip)
+            .limit(10)
+            .sort({ createdAt: -1 })
+            .exec(),
+            this.albumModel.countDocuments(), //total
+        ]);
+
+        return {
+            data: albums,
+            meta: {
+            total,
+            page,
+            lastPage: Math.ceil(total / 10),
+            },
+        };
     }
+
 
     //get one album by id
     async getAlbumById(id: string): Promise<any> {
@@ -183,5 +208,15 @@ export class AlbumsService {
         const newData = { data, songs };
 
         return newData;
+    }
+
+    async getAlbumsFromFollowing(id: string): Promise<any> {
+        if(!isValidObjectId(id)){
+            throw new BadRequestException('Invalid ID');
+        }
+
+        const data = await this.followsService.getAllFollowing(id);
+
+        return data;
     }
 }
