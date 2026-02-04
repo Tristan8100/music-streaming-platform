@@ -10,6 +10,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { SongsService } from './songs/songs.service';
 import { LikeService } from './likes/like.service';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('music')
 export class MusicController {
@@ -21,6 +22,7 @@ export class MusicController {
   ) {}
 
   //ALBUMS ---------------------------------------------------------------------
+  @ApiOperation({ summary: 'Create Album' })
   @UseGuards(AuthGuard, RolesGuard)
   @Post('albums')
   @UseInterceptors(FileInterceptor('file')) // USE FILE INTERCEPTOR TO ALLOW VALIDATION ON DTO WHEN USING FORM-DATA REMEMBER!!!!!
@@ -29,6 +31,7 @@ export class MusicController {
     return this.albumsService.createAlbum(data, req.user.id, file);
   }
 
+  @ApiOperation({ summary: 'Update Album' })
   @UseGuards(AuthGuard, RolesGuard)
   @Post('albums-update/:id')
   @UseInterceptors(FileInterceptor('file'))
@@ -36,36 +39,42 @@ export class MusicController {
     return this.albumsService.updateAlbum(id, data, req.user.id, file);
   }
 
+  @ApiOperation({ summary: 'Get All Albums (general use for admin)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums')
   showAllAlbums() {
     return this.albumsService.showAllAlbums();
   }
 
+  @ApiOperation({ summary: 'Get One Album data (without songs)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums/:id')
   getAlbumById(@Param('id') id: string) {
     return this.albumsService.getAlbumById(id);
   }
 
+  @ApiOperation({ summary: 'Delete Album' })
   @UseGuards(AuthGuard, RolesGuard)
   @Delete('albums/:id')
   deleteAlbum(@Param('id') id: string, @Request() req) {
     return this.albumsService.deleteAlbum(id, req.user.id);
   }
 
+  @ApiOperation({ summary: 'Get Albums By Authenticated User' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums-user') //EXECUTE THE ROUTE WITHOUT PARAMS FIRST
   getAlbumsByAuthUserId(@Request() req) { //GET USER FROM REQ OBJECT/AUTHENTICATED USER
     return this.albumsService.getAlbumsByUserId(req.user.id);
   }
 
+  @ApiOperation({ summary: 'Get Albums By User ID Params' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums-user/:id') //GET USER BY ID IN PARAMS
   getAlbumsByUserId(@Param('id') id: string) {
     return this.albumsService.getAlbumsByUserId(id);
   }
 
+  @ApiOperation({ summary: 'Get Albums And Songs, Params id is the album id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums/songs/:id')
   getAlbumsAndSongs(@Param('id') id: string) {
@@ -73,12 +82,14 @@ export class MusicController {
   }
 
   //SONGS ----------------------------------------------------------------------
+  @ApiOperation({ summary: 'Get One Song Data (without album)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('songs/:id') // THE ID IS SONG ID
   getSongById(@Param('id') id: string) {
     return this.songsService.getSongById(id);
   }
 
+  @ApiOperation({ summary: 'Create Song, Params id is the album id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Post('songs/:id') // THE ID IS ALBUM ID
   @UseInterceptors(FileInterceptor('file'))
@@ -86,12 +97,14 @@ export class MusicController {
     return this.songsService.createSong(req.user.id, data, id, file);
   }
 
+  @ApiOperation({ summary: 'Update Song, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Put('songs/:id') // THE ID IS SONG ID
   updateSong(@Body() data: UpdateSongDto, @Param('id') id: string, @Request() req) {
     return this.songsService.editSong(req.user.id, data, id);
   }
 
+  @ApiOperation({ summary: 'Delete Song, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Delete('songs/:id') // THE ID IS SONG ID
   deleteSong(@Param('id') id: string, @Request() req) {
@@ -99,18 +112,21 @@ export class MusicController {
   }
 
   //LIKES ----------------------------------------------------------------------
+  @ApiOperation({ summary: 'Like Song, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Post('songs-like/:id')
   likeSong(@Param('id') id: string, @Request() req) {
     return this.likeService.likeSong(req.user.id, id);
   }
 
+  @ApiOperation({ summary: 'UnLike Song, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Delete('songs-unlike/:id')
   unLikeSong(@Param('id') id: string, @Request() req) {
     return this.likeService.unLikeSong(req.user.id, id);
   }
 
+  @ApiOperation({ summary: 'Plays count, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('songs-play/:id') //not yet tested
   getSongLikes(@Param('id') id: string) {
