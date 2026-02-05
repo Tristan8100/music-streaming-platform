@@ -27,13 +27,14 @@ export class StorageService {
         contentType: file.mimetype,
       });
 
+    if (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
+    }
+
     const { data : actual_url } = this.client.storage //duplicate data needs to deserialized
       .from(bucket)
       .getPublicUrl(data?.path as string);
-
-    if (error) {
-      throw new InternalServerErrorException(error.message);
-    }
 
     return {
       path: actual_url.publicUrl,

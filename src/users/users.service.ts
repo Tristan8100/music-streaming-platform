@@ -12,6 +12,7 @@ import { UpdatePassword, UpdateProfile, UpdateUserDto } from './dto/update-user.
 import { User, UserDocument } from './entities/user.entity';
 
 import { StorageService } from 'src/storage/storage.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -144,7 +145,7 @@ export class UsersService {
     //add new
     const newData = await this.storageService.upload(
       'file_storage', // Supabase bucket can be env
-      `profile-pictures/${Date.now()}-${data.originalname}`,
+      `profile-pictures/${Date.now()}-${randomUUID()}`, //CHANGED
       data,
     );
 

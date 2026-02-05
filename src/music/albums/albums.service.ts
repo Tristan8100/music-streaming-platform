@@ -7,6 +7,7 @@ import { StorageService } from 'src/storage/storage.service';
 import { FollowsService } from 'src/users/follows/follows.service';
 import { Song, SongDocument } from '../entities/song.entity';
 import { ObjectId } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AlbumsService {
@@ -34,7 +35,7 @@ export class AlbumsService {
         //upload photo
         const photo = await this.storageService.upload(
             'file_storage', // Supabase bucket put to env
-            `try/${Date.now()}-${file.originalname}`,
+            `try/${Date.now()}-${randomUUID()}`, //CHANGED
             file,
         );
         //create album
