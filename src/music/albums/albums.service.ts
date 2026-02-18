@@ -39,13 +39,13 @@ export class AlbumsService {
             file,
         );
         //create album
-        const arr = data.genre_album ? JSON.parse(data.genre_album as any) : []; //considered as string idk why just fcking parse it
-        console.log(data.genre_album); //FIX VULNERABILITIES
+        // const arr = data.genre_album ? JSON.parse(data.genre_album as any) : []; //considered as string idk why just fcking parse it
+        // console.log(data.genre_album); //FIX VULNERABILITIES
         const album = await this.albumModel.create({
             title: data.title,
             description: data.description,
             owner: userId,
-            genre_album: arr,
+            genre_album: data.genre_album,
             photo_local_path: photo.local_path,
             photo_url: photo.path,
         });
