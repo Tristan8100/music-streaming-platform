@@ -37,7 +37,7 @@ export class FollowsService {
                 await this.userModel.updateOne({ _id: followId }, { $inc: { followers_count: 1 } }).exec();
                 await this.userModel.updateOne({ _id: data.id }, { $inc: { following_count: 1 } }).exec();
                 return { message: 'Followed successfully' };
-            } catch (error) {
+            } catch (error : any) {
                 if(error.code === 11000) {
                     throw new UnauthorizedException('You are already following this user');
                 } else {
