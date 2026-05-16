@@ -80,7 +80,7 @@ export class SongsService {
 
             return { message: 'Song updated successfully', data: song };
 
-        } catch (error) {
+        } catch (error : any) {
             throw new BadRequestException('Error updating song' + error.message);
         }
     }

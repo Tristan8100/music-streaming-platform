@@ -17,10 +17,10 @@
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
+    "strictPropertyInitialization": false, //ADDED TO FIX DTO ERROR
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
-    "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node", "multer", "jest"],
+    "types": ["node", "multer", "jest"]
   }
 }
