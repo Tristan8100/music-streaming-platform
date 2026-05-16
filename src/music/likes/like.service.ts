@@ -40,7 +40,7 @@ export class LikeService {
             const newLike = await this.likeModel.create({ user_id: userId, song_id: songId });
             const song = await this.songModel.findOneAndUpdate({ _id: songId }, { $inc: { likes_count: 1 }, $max: { likes_count: 0 } }, { new: true });
             return { message: 'Song liked successfully', data: newLike, song: song };
-        } catch (error) {
+        } catch (error : any) {
             if (error.code === 11000) {
                 return { message: 'Song already liked' };
             } else {

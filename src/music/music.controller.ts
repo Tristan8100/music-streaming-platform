@@ -42,8 +42,8 @@ export class MusicController {
   @ApiOperation({ summary: 'Get All Albums (general use for admin)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums')
-  showAllAlbums(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number) {
-    return this.albumsService.showAllAlbums(page);
+  showAllAlbums(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number, @Query('search') search?: string) {
+    return this.albumsService.showAllAlbums(page, search);
   }
 
   @ApiOperation({ summary: 'Get One Album data (without songs)' })
@@ -90,8 +90,8 @@ export class MusicController {
   //SONGS ----------------------------------------------------------------------
   @UseGuards(AuthGuard, RolesGuard)
   @Get('songs-all')
-  getAllSongs(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number) {
-    return this.songsService.getAllSongs(page);
+  getAllSongs(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number, @Query('search') search?: string) {
+    return this.songsService.getAllSongs(page, search);
   }
 
   @ApiOperation({ summary: 'Get One Song Data (without album)' })

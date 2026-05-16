@@ -19,10 +19,19 @@ export class SongsService {
         private readonly storageService: StorageService,
     ) {}
 
-    async getAllSongs(page : number): Promise<any> {
+    async getAllSongs(page : number, search?: string): Promise<any> {
         const skip = (page - 1) * 10;
+        
+        const query : any = {};
+        if(search) {
+            query.$or =  [
+                    { name: { $regex: search, $options: 'i' } },
+                    { genre_song: { $regex: search, $options: 'i' } },
+                ];   
+        }
+
         const [songs, total] = await Promise.all([
-            this.songModel.find().populate('album_id').populate('user_id').skip(skip).limit(10).sort({ createdAt: -1 }).exec(),
+            this.songModel.find(query).populate('album_id').populate('user_id').skip(skip).limit(10).sort({ createdAt: -1 }).exec(),
             this.songModel.countDocuments()
         ]);
         

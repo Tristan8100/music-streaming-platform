@@ -116,12 +116,19 @@ export class AlbumsService {
     }
 
     //get overall albums
-    async showAllAlbums(page: number) {
+    async showAllAlbums(page: number, search?: string) {
         const skip = (page - 1) * 10;
+        const query : any = {};
+        if(search) {
+            query.$or =  [
+                    { title: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } },
+                ];   
+        }
 
         const [albums, total] = await Promise.all([
             this.albumModel //albums
-            .find()
+            .find(query)
             .populate('owner', 'name photo_url email')
             .skip(skip)
             .limit(10)
