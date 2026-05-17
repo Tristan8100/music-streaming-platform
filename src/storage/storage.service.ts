@@ -45,7 +45,7 @@ export class StorageService {
 
       return {
         path: result.secure_url,     // SAME AS OLD "path"
-        local_path: result.public_id, // SAME AS OLD "local_path"
+        local_path: result.secure_url, // SAME AS OLD "local_path"   public_id
       };
     } catch (error : any) {
       console.log(error);

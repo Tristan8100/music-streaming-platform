@@ -61,11 +61,13 @@ export class AlbumsService {
         if (!album) {
             throw new NotFoundException('Album not found');
         }
-        const arr = JSON.parse(data.genre_album as any); //FIX VULNERABILITIES
+        //const arr = JSON.parse(data.genre_album as any); //FIX VULNERABILITIES
+
         let datas; // delare heree
         //check photo
         if (file) {
             //delete old photo if exists
+            console.log('deleting photo from storage', album.photo_url);
             this.storageService.delete(
                 'file_storage',
                 album.photo_url as string,
@@ -91,7 +93,7 @@ export class AlbumsService {
                         title: data.title,
                         description: data.description,
                         owner: userId,
-                        genre_album: arr,
+                        genre_album: data.genre_album,
                         photo_local_path: photo.path,
                         photo_url: photo.local_path,
                     },
@@ -105,7 +107,7 @@ export class AlbumsService {
                         title: data.title,
                         description: data.description,
                         owner: userId,
-                        genre_album: arr,
+                        genre_album: data.genre_album,
                     }
                 }
             );
