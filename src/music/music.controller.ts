@@ -96,14 +96,14 @@ export class MusicController {
 
   @ApiOperation({ summary: 'Get One Song Data (without album)' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Get('songs/:id') // THE ID IS SONG ID
+  @Get('songs/:id') // THE ID IS SONG ID, fetching only one songs
   getSongById(@Param('id') id: string) {
     return this.songsService.getSongById(id);
   }
 
   @ApiOperation({ summary: 'Create Song, Params id is the album id' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Post('songs/:id') // THE ID IS ALBUM ID
+  @Post('songs/:id') // THE ID IS ALBUM ID, for creating a song
   @UseInterceptors(FileInterceptor('file'))
   createSong(@Body() data: CreateSongsDto, @Param('id') id: string, @Request() req, @UploadedFile() file: Express.Multer.File) {
     return this.songsService.createSong(req.user.id, data, id, file);
@@ -111,14 +111,14 @@ export class MusicController {
 
   @ApiOperation({ summary: 'Update Song, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Put('songs/:id') // THE ID IS SONG ID
+  @Put('songs/:id') // THE ID IS SONG ID, for updating a song
   updateSong(@Body() data: UpdateSongDto, @Param('id') id: string, @Request() req) {
     return this.songsService.editSong(req.user.id, data, id);
   }
 
   @ApiOperation({ summary: 'Delete Song, Params id is the song id' })
   @UseGuards(AuthGuard, RolesGuard)
-  @Delete('songs/:id') // THE ID IS SONG ID
+  @Delete('songs/:id') // THE ID IS SONG ID, for deleting a song
   deleteSong(@Param('id') id: string, @Request() req) {
     return this.songsService.deleteSong(req.user.id, id);
   }
