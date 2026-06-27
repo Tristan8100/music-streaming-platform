@@ -56,15 +56,17 @@ export class SongsService {
         //get music path
         const { path, local_path } = musicPath;
         //create song in db
-        const parsedGenreSong = data.genre_song ? JSON.parse(data.genre_song as any) : [];
+        //const parsedGenreSong = data.genre_song ? JSON.parse(data.genre_song as any) : [];
         const newSong = await this.songModel.create({
             name: data.name,
             song_local_path: local_path,
             song_url: path,
             album_id: albumId,
             user_id: userId, //added new
-            genre_song: parsedGenreSong,
+            genre_song: data.genre_song, //parsedGenreSong,
         });
+
+        
 
         return {message: 'Song created successfully', data: newSong}; //to be implemented
     }
