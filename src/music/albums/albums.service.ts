@@ -118,33 +118,143 @@ export class AlbumsService {
     }
 
     //get overall albums
-    async showAllAlbums(page: number, search?: string) {
+    async showAllAlbums(page: number, search?: string, sort?: string) {
         const skip = (page - 1) * 10;
         const query : any = {};
-        if(search) {
-            query.$or =  [
-                    { title: { $regex: search, $options: 'i' } },
-                    { description: { $regex: search, $options: 'i' } },
-                ];   
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: 'i' } },
+                { description: { $regex: search, $options: 'i' } },
+            ];
         }
 
+        // default sort: newest first by created_at
+        if (!sort || sort === 'date') {
+            const [albums, total] = await Promise.all([
+                this.albumModel
+                    .find(query)
+                    .populate('owner', 'name photo_url email')
+                    .skip(skip)
+                    .limit(10)
+                    .sort({ created_at: -1 })
+                    .exec(),
+                this.albumModel.countDocuments(query),
+            ]);
+
+            return {
+                data: albums,
+                meta: {
+                    total,
+                    page,
+                    lastPage: Math.ceil(total / 10),
+                },
+            };
+        }
+
+        // oldest first
+        if (sort === 'oldest') {
+            const [albums, total] = await Promise.all([
+                this.albumModel
+                    .find(query)
+                    .populate('owner', 'name photo_url email')
+                    .skip(skip)
+                    .limit(10)
+                    .sort({ created_at: 1 })
+                    .exec(),
+                this.albumModel.countDocuments(query),
+            ]);
+
+            return {
+                data: albums,
+                meta: {
+                    total,
+                    page,
+                    lastPage: Math.ceil(total / 10),
+                },
+            };
+        }
+
+        // popular: sort by number of songs (descending), then newest
+        if (sort === 'popular') {
+            // aggregate albums with song counts and owner lookup
+            const pipeline: any[] = [
+                { $match: query },
+                {
+                    $lookup: {
+                        from: 'songs',
+                        localField: '_id',
+                        foreignField: 'album_id',
+                        as: 'songs',
+                    },
+                },
+                {
+                    $addFields: {
+                        songsCount: { $size: { $ifNull: ['$songs', []] } },
+                        totalPlays: {
+                            $reduce: {
+                                input: { $ifNull: ['$songs', []] },
+                                initialValue: 0,
+                                in: { $add: ['$$value', { $ifNull: ['$$this.plays', 0] }] },
+                            },
+                        },
+                        totalLikes: {
+                            $reduce: {
+                                input: { $ifNull: ['$songs', []] },
+                                initialValue: 0,
+                                in: { $add: ['$$value', { $ifNull: ['$$this.likes_count', 0] }] },
+                            },
+                        },
+                    },
+                },
+                { $sort: { songsCount: -1, created_at: -1 } },
+                { $skip: skip },
+                { $limit: 10 },
+                { $project: { songs: 0 } },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'owner',
+                        foreignField: '_id',
+                        as: 'owner',
+                    },
+                },
+                { $unwind: { path: '$owner', preserveNullAndEmptyArrays: true } },
+                { $project: { 'owner.password': 0 } },
+            ];
+
+            const [albumsAgg, total] = await Promise.all([
+                this.albumModel.aggregate(pipeline).exec(),
+                this.albumModel.countDocuments(query),
+            ]);
+
+            return {
+                data: albumsAgg,
+                meta: {
+                    total,
+                    page,
+                    lastPage: Math.ceil(total / 10),
+                },
+            };
+        }
+
+        // fallback: default ordering
         const [albums, total] = await Promise.all([
-            this.albumModel //albums
-            .find(query)
-            .populate('owner', 'name photo_url email')
-            .skip(skip)
-            .limit(10)
-            .sort({ createdAt: -1 })
-            .exec(),
-            this.albumModel.countDocuments(), //total
+            this.albumModel
+                .find(query)
+                .populate('owner', 'name photo_url email')
+                .skip(skip)
+                .limit(10)
+                .sort({ created_at: -1 })
+                .exec(),
+            this.albumModel.countDocuments(query),
         ]);
 
         return {
             data: albums,
             meta: {
-            total,
-            page,
-            lastPage: Math.ceil(total / 10),
+                total,
+                page,
+                lastPage: Math.ceil(total / 10),
             },
         };
     }

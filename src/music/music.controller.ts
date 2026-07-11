@@ -42,8 +42,12 @@ export class MusicController {
   @ApiOperation({ summary: 'Get All Albums (general use for admin)' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums')
-  showAllAlbums(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number, @Query('search') search?: string) {
-    return this.albumsService.showAllAlbums(page, search);
+  showAllAlbums(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('search') search?: string,
+    @Query('sort') sort?: string,
+  ) {
+    return this.albumsService.showAllAlbums(page, search, sort);
   }
 
   @ApiOperation({ summary: 'Get One Album data (without songs)' })
