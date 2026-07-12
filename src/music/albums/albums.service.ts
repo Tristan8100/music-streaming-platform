@@ -176,7 +176,6 @@ export class AlbumsService {
 
         // popular: sort by number of songs (descending), then newest
         if (sort === 'popular') {
-            // aggregate albums with song counts and owner lookup
             const pipeline: any[] = [
                 { $match: query },
                 {
@@ -210,16 +209,6 @@ export class AlbumsService {
                 { $skip: skip },
                 { $limit: 10 },
                 { $project: { songs: 0 } },
-                {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'owner',
-                        foreignField: '_id',
-                        as: 'owner',
-                    },
-                },
-                { $unwind: { path: '$owner', preserveNullAndEmptyArrays: true } },
-                { $project: { 'owner.password': 0 } },
             ];
 
             const [albumsAgg, total] = await Promise.all([
@@ -227,8 +216,13 @@ export class AlbumsService {
                 this.albumModel.countDocuments(query),
             ]);
 
+            const albumsWithOwner = await this.albumModel.populate(albumsAgg, {
+                path: 'owner',
+                select: 'name photo_url email',
+            });
+
             return {
-                data: albumsAgg,
+                data: albumsWithOwner,
                 meta: {
                     total,
                     page,
