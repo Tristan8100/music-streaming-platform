@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UploadedFile, UseInterceptors, BadRequestException, } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, UploadedFile, UseInterceptors, BadRequestException, DefaultValuePipe, ParseIntPipe, } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePassword, UpdateProfile, UpdateUserDto } from './dto/update-user.dto';
@@ -9,6 +9,7 @@ import { RolesGuard } from 'src/auth/auth.user';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StorageService } from 'src/storage/storage.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Query } from '@nestjs/common';
 
 @Controller('users')
 export class UsersController {
@@ -80,8 +81,9 @@ export class UsersController {
   @ApiOperation({ summary: 'Get All Currently Authenticated User Following' })
   @UseGuards(AuthGuard, RolesGuard)
   @Get('following')
-  getAllFollowing(@Request() req) {
-    return this.followsService.getAllFollowing(req.user.id);
+  @UseGuards(AuthGuard, RolesGuard)
+  getAllFollowing(@Request() req, @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number, @Query('limit') limit: number) {
+    return this.followsService.getAllFollowing(req.user.id, page, limit);
   }
 
 

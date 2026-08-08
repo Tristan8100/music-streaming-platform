@@ -87,8 +87,8 @@ export class MusicController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Get('albums-following')
-  getSongsByAlbumId(@Request() req) {
-    return this.albumsService.getAlbumsFromFollowing(req.user.id);
+  getSongsByAlbumId(@Request() req, @Query('page') page: number, @Query('limit') limit: number) {
+    return this.albumsService.getAlbumsFromFollowing(req.user.id, page, limit);
   }
 
   //SONGS ----------------------------------------------------------------------

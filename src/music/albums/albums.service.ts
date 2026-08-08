@@ -324,12 +324,12 @@ export class AlbumsService {
         return newData;
     }
 
-    async getAlbumsFromFollowing(id: string): Promise<any> {
+    async getAlbumsFromFollowing(id: string, page: number, limit: number): Promise<any> {
         if(!isValidObjectId(id)){
             throw new BadRequestException('Invalid ID');
         }
 
-        const data = await this.followsService.getAllFollowing(id);
+        const data = await this.followsService.getAllFollowing(id, page, limit);
 
         return data;
     }

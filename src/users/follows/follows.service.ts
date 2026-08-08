@@ -78,11 +78,29 @@ export class FollowsService {
         return user;
     }
 
-    async getAllFollowing(id: string): Promise<any> {
-        const user = await this.followModel.find({ follower: id }).populate('following', 'name email photo_url').exec();
+    async getAllFollowing(id: string, page: number, limit: number): Promise<any> {
+        const skip = (page - 1) * limit;
+        
+        const user = await this.followModel
+            .find({ follower: id })
+            .populate('following', 'name email photo_url')
+            .skip(skip)
+            .limit(limit)
+            .exec();
+        
         if(!user) {
             throw new NotFoundException(`User with ID ${id} not found`);
         }
-        return user;
+        
+        const total = await this.followModel.countDocuments({ follower: id });
+        
+        return {
+            data: user,
+            meta: {
+                total,
+                page,
+                lastPage: Math.ceil(total / limit),
+            },
+        };
     }
 }
